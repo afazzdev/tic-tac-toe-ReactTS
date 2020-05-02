@@ -1,44 +1,83 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Game.css';
 import Board from './Board';
-import useCalculateWinner from './useCalculateWinner';
+import calculateWinner from './calculateWinner';
+
+type TIndex = number;
 
 type TSquare = { squares: string[] };
 type THistory = TSquare[];
+type TStep = number;
+type TXIsNext = boolean;
 
-function Game() {
-  const [history, setHistory] = useState<THistory>([
+type TState = {
+  history: THistory;
+  stepNumber: TStep;
+  xIsNext: TXIsNext;
+};
+
+const initialState = {
+  history: [
     {
       squares: Array(9).fill(null),
     },
-  ]);
-  const [xIsNext, setXIsNext] = useState<boolean>(true);
-  let historyCopy: THistory = [...history];
-  let current: TSquare = historyCopy[historyCopy.length - 1];
-  const winner = useCalculateWinner(current.squares);
+  ],
+  stepNumber: 0,
+  xIsNext: true,
+};
 
-  useEffect(() => {
-    historyCopy = [...history];
-    current = historyCopy[historyCopy.length - 1];
-  }, [history]);
+function Game() {
+  const [state, setState] = useState<TState>(initialState);
 
-  const handleClick = (i: number): void => {
-    const squaresCopy = current.squares.slice();
+  const handleClick = (i: TIndex): void => {
+    const { stepNumber, xIsNext } = state;
+    const history = state.history.slice(0, stepNumber + 1);
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
 
-    if (winner || squaresCopy[i]) {
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squaresCopy[i] = xIsNext ? 'X' : 'O';
-    setHistory([...history, { squares: squaresCopy }]);
-    setXIsNext(!xIsNext);
+    squares[i] = xIsNext ? 'X' : 'O';
+    setState({
+      history: history.concat([
+        {
+          squares: squares,
+        },
+      ]),
+      stepNumber: history.length,
+      xIsNext: !xIsNext,
+    });
   };
+
+  const jumpTo = (step: TStep) => {
+    if (step === 0) return setState(initialState);
+    setState({
+      ...state,
+      stepNumber: step,
+      xIsNext: step % 2 === 0,
+    });
+  };
+
+  const moves = state.history.map((step, move) => {
+    const desc = move ? 'Go to move #' + move : 'Reset';
+    return (
+      <li key={`key-${move}`}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+      </li>
+    );
+  });
+
+  const { history, stepNumber } = state;
+  const current = history[stepNumber];
+  const winner = calculateWinner(current.squares);
 
   let status: string;
   if (winner) {
     status = 'Winner: ' + winner;
   } else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+    status = 'Next player: ' + (state.xIsNext ? 'X' : 'O');
   }
 
   return (
@@ -48,7 +87,7 @@ function Game() {
       </div>
       <div className='game-info'>
         <div>{status}</div>
-        <ol>{/* TODO */}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
