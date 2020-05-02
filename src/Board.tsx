@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Square from './Square';
 import useCalculateWinner from './useCalculateWinner';
 
-type IBoard = {
+type IRenderSquare = {
   i: number;
 };
 
-export type TSquare = string[];
+type IBoard = {
+  squares: string[];
+  xIsNext: boolean;
+  setSquare: (squares: IBoard['squares']) => void;
+  setXIsNext: (xIsNext: IBoard['xIsNext']) => void;
+};
 
-function Board() {
-  const [square, setSquare] = useState<TSquare>(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState<boolean>(true);
-  const winner = useCalculateWinner(square);
+function Board({ squares, xIsNext, setSquare, setXIsNext }: IBoard) {
+  const winner = useCalculateWinner(squares);
   let status: string;
   if (winner) {
     status = 'Winner: ' + winner;
@@ -20,14 +23,17 @@ function Board() {
   }
 
   const handleClick = (i: number): void => {
-    const squares = square.slice();
-    squares[i] = xIsNext ? 'X' : 'O';
-    setSquare(squares);
+    const squaresCopy = squares.slice();
+    if (winner || squares[i]) {
+      return;
+    }
+    squaresCopy[i] = xIsNext ? 'X' : 'O';
+    setSquare(squaresCopy);
     setXIsNext(!xIsNext);
   };
 
-  function RenderSquare({ i }: IBoard) {
-    return <Square value={square[i]} onClick={() => handleClick(i)} />;
+  function RenderSquare({ i }: IRenderSquare) {
+    return <Square value={squares[i]} onClick={() => handleClick(i)} />;
   }
 
   return (

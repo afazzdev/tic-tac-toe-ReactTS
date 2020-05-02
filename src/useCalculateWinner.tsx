@@ -1,4 +1,4 @@
-import { TSquare } from './Board';
+import { TSquare } from './Game';
 
 function useCalculateWinner(squares: TSquare) {
   const lines = [
