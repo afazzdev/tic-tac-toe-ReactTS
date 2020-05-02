@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import Square from './Square';
+import useCalculateWinner from './useCalculateWinner';
 
 type IBoard = {
   i: number;
 };
 
-type TSquare = string[];
+export type TSquare = string[];
 
 function Board() {
   const [square, setSquare] = useState<TSquare>(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState<boolean>(true);
-  const status: string = 'Next player: ' + (xIsNext ? 'X' : 'O');
+  const winner = useCalculateWinner(square);
+  let status: string;
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+  }
 
   const handleClick = (i: number): void => {
     const squares = square.slice();
