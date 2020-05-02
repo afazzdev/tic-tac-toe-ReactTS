@@ -1,8 +1,8 @@
 import React from 'react';
 
 type ISquare = {
-  value?: string | null;
-  onClick?: React.MouseEventHandler;
+  value: string | null;
+  onClick: React.MouseEventHandler;
 };
 
 type State = string | null;

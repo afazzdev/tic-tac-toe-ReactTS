@@ -1,6 +1,4 @@
-import { TSquare } from './Game';
-
-function useCalculateWinner(squares: TSquare) {
+function calculateWinner(squares: string[]) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -20,4 +18,4 @@ function useCalculateWinner(squares: TSquare) {
   return null;
 }
 
-export default useCalculateWinner;
+export default calculateWinner;
