@@ -10,7 +10,7 @@ type TSquare = string[];
 function Board() {
   const [square, setSquare] = useState<TSquare>(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState<boolean>(true);
-  const status: string = 'Next player: X';
+  const status: string = 'Next player: ' + (xIsNext ? 'X' : 'O');
 
   const handleClick = (i: number): void => {
     const squares = square.slice();
